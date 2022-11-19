@@ -1,2 +1,8 @@
 // app global css in SCSS form
-@import "foundation/custom_colors";
+@import "foundation/custom_colors", "foundation/typography";
+
+p,
+h1,
+h2 {
+  margin: 0;
+}

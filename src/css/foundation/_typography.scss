@@ -1,0 +1,67 @@
+// Define global typography classes
+@import url("https://fonts.googleapis.com/css2?family=Readex+Pro:wght@200;300;400;500;600;700&display=swap");
+
+h1,
+.text-h1 {
+  font-family: "Readex Pro";
+  font-weight: 600;
+  font-size: 24px;
+  line-height: 32px;
+}
+
+h2,
+.text-h2 {
+  font-family: "Readex Pro";
+  font-weight: 500;
+  font-size: 20px;
+  line-height: 28px;
+}
+
+.text-subtitle1 {
+  font-family: "Readex Pro";
+  font-weight: 500;
+  font-size: 20px;
+  line-height: 28px;
+}
+
+.text-subtitle2 {
+  font-family: "Readex Pro";
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 24px;
+}
+
+.text-body1 {
+  font-family: "Roboto";
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 24px;
+}
+
+.text-body2 {
+  font-family: "Roboto";
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 24px;
+}
+
+.text-body3 {
+  font-family: "Roboto";
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 22px;
+}
+
+.text-caption {
+  font-family: "Roboto";
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 16px;
+}
+
+.text-overline {
+  font-family: "Roboto";
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 16px;
+}
