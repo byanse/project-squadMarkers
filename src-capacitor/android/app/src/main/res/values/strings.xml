@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">PokeSquad</string>
+    <string name="title_activity_main">PokeSquad</string>
+    <string name="package_name">byanse.pokesquadapp.squadmakers.com</string>
+    <string name="custom_url_scheme">byanse.pokesquadapp.squadmakers.com</string>
+</resources>

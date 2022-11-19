@@ -1,0 +1,7 @@
+{
+  "appId": "byanse.pokesquadapp.squadmakers.com",
+  "appName": "PokeSquad",
+  "bundledWebRuntime": false,
+  "npmClient": "yarn",
+  "webDir": "www"
+}
