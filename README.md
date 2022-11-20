@@ -2,42 +2,39 @@
 
 SquadMaker's Pokemon Challenge
 
-## Install the dependencies
+Tecnologías utilizadas:
+yarn => 1.22.19
+node => v16.18.1
+quasar-cli => 1.3.2
+android-studio => Android Studio Doplhin | 2021.3.1 Patch 1
+
+## Instalar las dependencias
 
 ```bash
 yarn
-# or
-npm install
 ```
 
-### Start the app in development mode (hot-code reloading, error reporting, etc.)
+### Iniciar el proyecto en modo desarrollo (Android)
 
 ```bash
-quasar dev
+yarn dev # Este comando abrirá la aplicación de Android Studio
+clic en "Run 'App'" # Esto abrirá el emulador seleccionado y correrá la app
 ```
 
-### Lint the files
+### Lint los archivos
 
 ```bash
 yarn lint
-# or
-npm run lint
 ```
 
-### Format the files
+### Dar formato a los archivos
 
 ```bash
 yarn format
-# or
-npm run format
 ```
 
-### Build the app for production
+### Compilar APK para producción
 
 ```bash
-quasar build
+quasar build -m capacitor -T android
 ```
-
-### Customize the configuration
-
-See [Configuring quasar.config.js](https://v2.quasar.dev/quasar-cli-vite/quasar-config-js).
