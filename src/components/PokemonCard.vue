@@ -1,5 +1,5 @@
 <template>
-  <q-card class="my-card">
+  <q-card class="my-card" @click="navigateToPokemonDetailsPage">
     <q-card-section class="q-pa-none">
       <div class="bg-neutral text-center">
         <img :src="imgUrl" width="170" height="170" />
@@ -44,6 +44,7 @@
 
 <script>
 import { defineComponent } from "vue";
+import { useRouter } from "vue-router";
 
 export default defineComponent({
   name: "PokemonCard",
@@ -55,8 +56,16 @@ export default defineComponent({
     experience: Number,
     types: [Object],
   },
-  setup() {
-    return {};
+  setup(props) {
+    const router = useRouter();
+
+    const navigateToPokemonDetailsPage = () => {
+      router.push({ name: "PokemonPage", params: { pokemonName: props.name } });
+    };
+
+    return {
+      navigateToPokemonDetailsPage,
+    };
   },
 });
 </script>
