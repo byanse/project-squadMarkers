@@ -1,11 +1,25 @@
 <template>
-  <router-view />
+  <router-view class="bg-neutral" />
 </template>
 
-<script>
-import { defineComponent } from 'vue'
+<script setup>
+import { Plugins } from "@capacitor/core";
+import { useQuasar } from "quasar";
+import { usePokemonStore } from "stores/pokemon";
 
-export default defineComponent({
-  name: 'App'
-})
+const { SplashScreen } = Plugins;
+
+const $q = useQuasar();
+const pokemonStore = usePokemonStore();
+
+pokemonStore.$subscribe((_, state) => {
+  if (state.loadingAll || state.loadingOne) {
+    $q?.loading.show();
+  } else {
+    $q?.loading.hide();
+    SplashScreen.hide();
+  }
+});
+
+pokemonStore.getPage();
 </script>

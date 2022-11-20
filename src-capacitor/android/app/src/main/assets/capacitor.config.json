@@ -4,6 +4,11 @@
   "bundledWebRuntime": false,
   "npmClient": "yarn",
   "webDir": "www",
+  "plugins": {
+    "SplashScreen": {
+      "launchAutoHide": false
+    }
+  },
   "server": {
     "url": "http://192.168.0.12:9500"
   }
