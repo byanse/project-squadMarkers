@@ -5,7 +5,9 @@
     <div>
       <div style="font-size: 30vh">404</div>
 
-      <div class="text-h2" style="opacity: 0.4">Oops. Nothing here...</div>
+      <div class="text-h2" style="opacity: 0.4">
+        Lo sentimos! No hay nada por aquí...
+      </div>
 
       <q-btn
         class="q-mt-xl"
@@ -13,7 +15,7 @@
         text-color="blue"
         unelevated
         to="/"
-        label="Go Home"
+        label="Ir al inicio"
         no-caps
       />
     </div>
@@ -24,6 +26,6 @@
 import { defineComponent } from "vue";
 
 export default defineComponent({
-  name: "ErrorNotFound",
+  name: "ErrorNotFoundPage",
 });
 </script>
