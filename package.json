@@ -8,8 +8,10 @@
   "scripts": {
     "lint": "eslint --ext .js,.vue ./",
     "format": "prettier --write \"**/*.{js,vue,scss,html,md,json}\" --ignore-path .gitignore",
-    "test": "echo \"No test specified\" && exit 0",
-    "dev": "quasar dev -m capacitor -T android"
+    "test": "echo \"See package.json => scripts for available tests.\" && exit 0",
+    "dev": "quasar dev -m capacitor -T android",
+    "test:unit": "vitest",
+    "test:unit:ci": "vitest run"
   },
   "dependencies": {
     "@quasar/extras": "^1.0.0",
@@ -23,13 +25,17 @@
   },
   "devDependencies": {
     "@quasar/app-vite": "^1.0.0",
+    "@quasar/quasar-app-extension-testing-unit-vitest": "^0.1.2",
+    "@vue/test-utils": "^2.0.0",
     "autoprefixer": "^10.4.2",
     "dotenv": "^16.0.3",
     "eslint": "^8.10.0",
     "eslint-config-prettier": "^8.1.0",
     "eslint-plugin-vue": "^9.0.0",
+    "msw": "^0.49.1",
     "postcss": "^8.4.14",
-    "prettier": "^2.5.1"
+    "prettier": "^2.5.1",
+    "vitest": "^0.15.0"
   },
   "engines": {
     "node": "^18 || ^16 || ^14.19",
