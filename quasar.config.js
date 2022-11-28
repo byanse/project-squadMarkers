@@ -56,6 +56,7 @@ module.exports = configure(function (/* ctx */) {
 
       alias: {
         composables: path.join(__dirname, "./src/composables"),
+        utils: path.join(__dirname, "./src/utils"),
       },
 
       vueRouterMode: "history", // available values: 'hash', 'history'
@@ -163,9 +164,7 @@ module.exports = configure(function (/* ctx */) {
     },
 
     // Full list of options: https://v2.quasar.dev/quasar-cli/developing-capacitor-apps/configuring-capacitor
-    capacitor: {
-      hideSplashscreen: false,
-    },
+    capacitor: {},
 
     // Full list of options: https://v2.quasar.dev/quasar-cli/developing-electron-apps/configuring-electron
     electron: {
