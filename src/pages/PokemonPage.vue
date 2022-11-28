@@ -1,16 +1,9 @@
 <template>
   <q-layout>
     <q-header>
-      <div class="bg-neutral" v-if="!error && !loadingOne && pokemon">
+      <div class="bg-neutral" v-if="!error && !loading && pokemon">
         <q-toolbar>
-          <q-btn
-            flat
-            round
-            dense
-            icon="arrow_back"
-            color="neutral-black"
-            @click="goBack"
-          />
+          <BtnBackButton />
         </q-toolbar>
         <q-toolbar class="column">
           <q-toolbar-title class="text-center text-neutral-black"
@@ -25,6 +18,7 @@
               :src="pokemon.sprites.other['official-artwork'].front_default"
               width="140"
               height="140"
+              :alt="pokemon.name"
             />
           </div>
         </q-toolbar>
@@ -33,7 +27,7 @@
 
     <q-page-container class="bg-white">
       <q-page>
-        <div class="flex column flex-center" v-if="error && !loadingOne">
+        <div class="flex column flex-center" v-if="error && !loading">
           <h2 class="text-red text-center">
             No pudimos encontrar el pokemon <b>{{ searchName }}</b> :(
             <br />
@@ -48,7 +42,7 @@
           />
         </div>
 
-        <div v-if="!error && !loadingOne && pokemon">
+        <div v-if="!error && !loading && pokemon">
           <q-tabs
             v-model="currentTab"
             align="left"
@@ -121,7 +115,10 @@
                 </div>
               </div>
               <h2>Base stats</h2>
-              <Bar :chart-data="chartData" :chart-options="chartOptions" />
+              <HorizontalBarChart
+                :labels="charLabels"
+                :datasets="chartDataset"
+              />
             </q-tab-panel>
 
             <q-tab-panel name="moves">
@@ -147,90 +144,66 @@
 import { ref, computed } from "vue";
 import { storeToRefs } from "pinia";
 import { usePokemonStore } from "stores/pokemon";
-import { useRouter, useRoute } from "vue-router";
-import { Bar } from "vue-chartjs";
-import {
-  Chart as ChartJS,
-  Title,
-  Tooltip,
-  Legend,
-  BarElement,
-  CategoryScale,
-  LinearScale,
-} from "chart.js";
+import { useRoute } from "vue-router";
+import BtnBackButton from "components/BtnBackButton.vue";
 import MoveBlock from "components/MoveBlock.vue";
+import HorizontalBarChart from "components/HorizontalBarChart.vue";
 import {
   parseHectogramsToKgs,
   parseHectogramsToPounds,
-  parseDecimetresToPounds,
-} from "src/utils";
-
-ChartJS.register(
-  Title,
-  Tooltip,
-  Legend,
-  BarElement,
-  CategoryScale,
-  LinearScale
-);
+  parseDecimetresToCentimeters,
+} from "utils";
 
 const pokemonStore = usePokemonStore();
-const router = useRouter();
 const route = useRoute();
 const {
   params: { pokemonName },
 } = route;
 
-const { pokemon, error, loadingOne } = storeToRefs(pokemonStore);
-const { getByName } = pokemonStore;
+const { pokemon, error, loading } = storeToRefs(pokemonStore);
 
 const currentTab = ref("about");
+const chartDataset = ref([]);
+const charLabels = [
+  "Speed",
+  "Sp Defense",
+  "Sp Attack",
+  "Defense",
+  "Attack",
+  "HP",
+];
 
-getByName(pokemonName);
-
-const chartData = {
-  labels: ["Speed", "Sp Defense", "Sp Attack", "Defense", "Attack", "HP"],
-  datasets: [],
-  backgroundColor: "blue",
-};
-
-const chartOptions = {
-  responsive: true,
-  indexAxis: "y",
-  plugins: {
-    legend: {
-      display: false,
-    },
-  },
-};
+pokemonStore.getByName(pokemonName);
 
 pokemonStore.$subscribe((_, state) => {
   if (state.pokemon) {
-    chartData.datasets.push({
-      backgroundColor: "#072ac8",
-      data: [
-        state.pokemon.stats.find((e) => e.stat.name === "speed")?.base_stat,
-        state.pokemon.stats.find((e) => e.stat.name === "special-defense")
-          ?.base_stat,
-        state.pokemon.stats.find((e) => e.stat.name === "special-attack")
-          ?.base_stat,
-        state.pokemon.stats.find((e) => e.stat.name === "defense")?.base_stat,
-        state.pokemon.stats.find((e) => e.stat.name === "attack")?.base_stat,
-        state.pokemon.stats.find((e) => e.stat.name === "hp")?.base_stat,
-      ],
-    });
+    chartDataset.value = [
+      {
+        backgroundColor: "#072ac8",
+        data: [
+          state.pokemon.stats.find((e) => e.stat.name === "speed")?.base_stat,
+          state.pokemon.stats.find((e) => e.stat.name === "special-defense")
+            ?.base_stat,
+          state.pokemon.stats.find((e) => e.stat.name === "special-attack")
+            ?.base_stat,
+          state.pokemon.stats.find((e) => e.stat.name === "defense")?.base_stat,
+          state.pokemon.stats.find((e) => e.stat.name === "attack")?.base_stat,
+          state.pokemon.stats.find((e) => e.stat.name === "hp")?.base_stat,
+        ],
+      },
+    ];
   }
 });
 
-const heightCm = computed(() => parseDecimetresToPounds(pokemon?.value.height));
+const heightCm = computed(() =>
+  parseDecimetresToCentimeters(pokemon?.value.height)
+);
+
 const weigthKg = computed(() => parseHectogramsToKgs(pokemon?.value.weight));
+
 const weigthPounds = computed(() =>
   parseHectogramsToPounds(pokemon?.value.weight)
 );
-
-const goBack = () => {
-  router.back();
-};
 </script>
 
 <style lang="scss" scoped></style>
