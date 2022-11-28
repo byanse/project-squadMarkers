@@ -7,11 +7,18 @@ yarn => 1.22.19
 node => v16.18.1
 quasar-cli => 1.3.2
 android-studio => Android Studio Doplhin | 2021.3.1 Patch 1
+vitest => 0.15.0
 
 ## Instalar las dependencias
 
 ```bash
 yarn
+```
+
+## Correr los tests
+
+```bash
+yarn test:unit
 ```
 
 ### Iniciar el proyecto en modo desarrollo (Android)
