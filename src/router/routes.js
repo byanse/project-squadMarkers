@@ -4,6 +4,11 @@ const routes = [
     component: () => import("pages/HomePage.vue"),
   },
   {
+    path: "/filters",
+    name: "FiltersPage",
+    component: () => import("pages/FiltersPage.vue"),
+  },
+  {
     path: "/pokemon/:pokemonName",
     name: "PokemonPage",
     component: () => import("pages/PokemonPage.vue"),
