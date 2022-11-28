@@ -1,8 +1,8 @@
 <template>
   <q-layout>
     <q-header>
-      <q-item class="bg-image">
-        <div class="q-px-md q-pt-xl q-pb-lg">
+      <q-item class="bg-image q-pa-none">
+        <div class="q-px-md q-pt-xl q-pb-lg col-grow">
           <h2 class="q-mb-lg text-white">
             What pokemon are you <br />
             looking for?
@@ -14,7 +14,7 @@
                 v-model="searchName"
                 filled
                 bg-color="neutral"
-                debounce="500"
+                debounce="1000"
                 placeholder="Search pokemon"
               >
                 <template v-slot:append>
@@ -22,12 +22,14 @@
                 </template>
               </q-input>
             </div>
+
             <q-btn
               flat
               round
               icon="tune"
               class="q-ml-lg"
               color="neutral-white"
+              @click="navigateToFiltersPage"
             />
           </div>
         </div>
@@ -35,124 +37,96 @@
     </q-header>
 
     <q-page-container>
-      <q-page>
-        <div
-          class="flex column flex-center"
-          v-if="error && !loadingAll && !loadingOne"
-        >
-          <h2 class="text-red text-center">
-            <span v-if="!searchName">
-              Lo sentimos!
-              <br />
-              Ha ocurrido un error, por favor recarga la página.
-            </span>
-            <span v-else>
-              No pudimos encontrar el pokemon <b>{{ searchName }}</b> :(
-              <br />
-              Asegurate de estar escribiendo bien el nombre!
-            </span>
-          </h2>
-          <q-btn
-            round
-            color="white"
-            text-color="red"
-            icon="replay"
-            @click="reset"
-          />
-        </div>
+      <q-page class="flex justify-between column">
+        <ErrorComponent
+          v-if="error && !loading"
+          :title="errorTitle"
+          :subtitle="errorSubtitle"
+          :retryableAction="reset"
+        />
 
-        <div v-if="!error && !loadingAll && !searchName">
-          <div class="row">
-            <div
-              class="col-12 q-pa-md"
-              v-for="(pokemon, index) in pokemons"
-              :key="index"
-            >
-              <PokemonCard
-                :imgUrl="
-                  pokemon.sprites.other['official-artwork'].front_default
-                "
-                :name="pokemon.name"
-                :number="pokemon.id"
-                :moves="pokemon.moves.length"
-                :experience="pokemon.base_experience"
-                :types="pokemon.types"
-              />
-            </div>
+        <div class="row q-pa-md" v-if="!error && !loading">
+          <q-card
+            class="col-12 q-mb-md q-pa-sm"
+            flat
+            v-if="pokemonStore.filters.currentFilters.length > 0"
+          >
+            <p class="text-subtitle2">
+              {{ pokemonStore.pagination.totalItems }} resultados
+            </p>
+          </q-card>
+
+          <div
+            class="col-12 q-mb-md"
+            v-for="(pokemon, index) in pokemons"
+            :key="index"
+          >
+            <PokemonCard
+              :imgUrl="pokemon.sprites.other['official-artwork'].front_default"
+              :name="pokemon.name"
+              :number="pokemon.id"
+              :moves="pokemon.moves.length"
+              :experience="pokemon.base_experience"
+              :types="pokemon.types"
+            />
           </div>
-
-          <q-pagination
-            class="flex-center bg-white q-py-sm"
-            v-model="currentPage"
-            :max="maxPages"
-            :max-pages="5"
-            direction-links
-            :boundary-links="false"
-            :ellipses="false"
-            @update:model-value="changePage"
-          />
         </div>
 
-        <div
-          v-if="!error && !loadingOne && searchName && pokemon"
-          class="q-pa-md"
-        >
-          <PokemonCard
-            :imgUrl="pokemon.sprites.other['official-artwork'].front_default"
-            :name="pokemon.name"
-            :number="pokemon.id"
-            :moves="pokemon.moves.length"
-            :experience="pokemon.base_experience"
-            :types="pokemon.types"
-          />
-        </div>
+        <PaginatorComponent
+          v-if="!error && !loading && pokemonStore.pagination.totalPages > 0"
+          v-model="pokemonStore.pagination.currentPage"
+          :total-pages="pokemonStore.pagination.totalPages"
+        />
       </q-page>
     </q-page-container>
   </q-layout>
 </template>
 
 <script setup>
-import { watch, ref } from "vue";
+import { watch, ref, onMounted, computed } from "vue";
 import { storeToRefs } from "pinia";
-import { usePokemonStore } from "stores/pokemon";
 import { useRouter, useRoute } from "vue-router";
+import { usePokemonStore } from "stores/pokemon";
 import PokemonCard from "components/PokemonCard.vue";
+import PaginatorComponent from "components/PaginatorComponent.vue";
+import ErrorComponent from "components/ErrorComponent.vue";
 
 const pokemonStore = usePokemonStore();
 const router = useRouter();
 const route = useRoute();
-const {
-  query: { q: searchedName },
-} = route;
+const { query } = route;
+const { pokemons, loading, error } = storeToRefs(pokemonStore);
 
-const { pokemons, pokemon, error, loadingAll, loadingOne, maxPages } =
-  storeToRefs(pokemonStore);
-const { getPage, getByName } = pokemonStore;
+onMounted(() => {
+  const searchTerm = query.q;
+
+  pokemonStore.initialize({ filterName: searchTerm });
+});
+
+const navigateToFiltersPage = () => {
+  router.push({ name: "FiltersPage" });
+};
 
 const reset = async () => {
-  router.replace({ path: "/", query: { q: "" } });
-  searchName.value = "";
-  currentPage.value = 1;
-  pokemonStore.$reset();
-  await getPage();
+  await pokemonStore.reset();
 };
 
-const changePage = (newPage) => {
-  getPage(newPage);
-};
-
-const searchName = ref(searchedName);
-const currentPage = ref(1);
-
-if (searchedName) {
-  getByName(searchedName);
-}
+const searchName = ref(query.q);
+const errorTitle = computed(() =>
+  searchName.value
+    ? `No pudimos encontrar el pokemon <b>${searchName.value}</b> :(`
+    : "Lo sentimos!"
+);
+const errorSubtitle = computed(() =>
+  searchName.value
+    ? `Asegurate de estar escribiendo bien el nombre!`
+    : "Ha ocurrido un error, por favor recarga la página."
+);
 
 watch(searchName, (currentValue, oldValue) => {
   if (currentValue != oldValue) {
     if (currentValue) {
-      router.replace({ path: "/", query: { q: currentValue } });
-      getByName(currentValue);
+      pokemonStore.filterByName(currentValue);
     } else {
       reset();
     }
@@ -160,4 +134,10 @@ watch(searchName, (currentValue, oldValue) => {
 });
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.bg-image {
+  background-image: url(https://d17mh033okktwq.cloudfront.net/uploads/59a58d7f-eb28-4ee9-999e-b96f534beb50/original/prueba.);
+  background-repeat: no-repeat;
+  background-position: right;
+}
+</style>
