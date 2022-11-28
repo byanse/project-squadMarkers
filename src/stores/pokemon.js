@@ -1,68 +1,113 @@
-import axios from "axios";
+import { ref } from "vue";
+import { useQuasar } from "quasar";
 import { defineStore } from "pinia";
+import { usePagination } from "composables/usePagination";
+import { usePokemons } from "composables/usePokemons";
+import useFilters from "composables/useFilters";
 
-const BASE_URL = "https://pokeapi.co/api/v2/pokemon";
+export const usePokemonStore = defineStore("pokemon", () => {
+  const $q = useQuasar();
+  const { fetchByName, fetchList } = usePokemons();
+  const initialized = ref(false);
+  const loading = ref(false);
+  const error = ref(false);
+  const pokemons = ref([]);
+  const pokemon = ref(null);
+  const filterName = ref(null);
 
-export const usePokemonStore = defineStore("pokemon", {
-  state: () => ({
-    loadingAll: true,
-    loadingOne: true,
-    pokemons: [],
-    pokemon: null,
-    error: null,
-    maxPages: null,
-  }),
+  const makeAsyncRequest = async (request) => {
+    $q.loading.show();
+    loading.value = true;
+    error.value = false;
 
-  getters: {},
+    try {
+      return await request;
+    } catch (err) {
+      error.value = true;
+      throw err;
+    } finally {
+      loading.value = false;
+      $q.loading.hide();
+    }
+  };
 
-  actions: {
-    async getPage(page = 1) {
-      this.loadingAll = true;
-      this.pokemons = [];
-      this.error = null;
-      this.currentPage = page;
-      const limit = 5;
-      const offset = limit * page - limit;
-
-      try {
-        const { data } = await axios.get(
-          `${BASE_URL}?limit=${limit}&offset=${offset}`
-        );
-
-        const pokemons = await Promise.all(
-          data.results.map((pokemon) =>
-            axios.get(pokemon.url).then((res) => res.data)
-          )
-        );
-
-        this.pokemons = pokemons;
-        this.maxPages = data.count / limit;
-      } catch (error) {
-        this.error = error;
-      } finally {
-        this.loadingAll = false;
-        this.loadingOne = false;
+  const initialize = async ({ filterName } = {}) => {
+    if (!initialized.value) {
+      if (filterName) {
+        await filterByName(filterName);
+      } else {
+        await getPage(pagination.currentPage.value);
       }
-    },
 
-    async getByName(name) {
-      if (!name) return;
-      this.loadingOne = true;
-      this.pokemon = null;
-      this.error = null;
+      initialized.value = true;
+    }
+  };
 
-      try {
-        const { data } = await axios.get(
-          `${BASE_URL}/${name.trim().toLowerCase()}`
-        );
+  const getPage = async (page = 1) => {
+    pokemons.value = [];
 
-        this.pokemon = data;
-      } catch (error) {
-        this.error = error;
-      } finally {
-        this.loadingAll = false;
-        this.loadingOne = false;
-      }
-    },
-  },
+    const limit = pagination.itemsPerPage.value;
+    const offset = (page - 1) * limit;
+
+    const pageData = await makeAsyncRequest(
+      fetchList(filters.currentFilters.value, limit, offset)
+    );
+
+    pagination.totalItems.value = pageData.count;
+    pokemons.value = pageData.results;
+  };
+
+  const filterByName = async (name) => {
+    if (!name) return;
+
+    filterName.value = name.trim().toLowerCase();
+
+    filters.reset();
+    pagination.reset();
+    pokemons.value = [
+      await makeAsyncRequest(fetchByName(name.trim().toLowerCase())),
+    ];
+  };
+
+  const getByName = async (name) => {
+    if (!name) return;
+
+    pokemon.value = await makeAsyncRequest(
+      fetchByName(name.trim().toLowerCase())
+    );
+  };
+
+  const reset = () => {
+    filters.reset();
+    pagination.reset();
+    initialized.value = false;
+    filterName.value = null;
+    initialize();
+  };
+
+  const handleFiltersChange = () => {
+    pagination.reset();
+    initialized.value = false;
+    filterName.value = null;
+    getPage();
+  };
+
+  const pagination = usePagination({ onChangePage: getPage });
+  const filters = useFilters({
+    onChangeFilters: handleFiltersChange,
+  });
+
+  return {
+    pokemons,
+    pagination,
+    filters,
+    pokemon,
+    loading,
+    error,
+    initialize,
+    getPage,
+    filterByName,
+    getByName,
+    reset,
+  };
 });
