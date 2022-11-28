@@ -5,7 +5,7 @@
   >
     <q-card-section class="text-center">
       <img
-        alt=""
+        :alt="title"
         :src="
           type === 1
             ? 'https://d17mh033okktwq.cloudfront.net/uploads/f239ef30-1d9c-46bf-a415-848b1510f6a1/original/prueba4.'

@@ -2,7 +2,7 @@
   <q-card class="my-card" @click="navigateToPokemonDetailsPage">
     <q-card-section class="q-pa-none">
       <div class="bg-neutral text-center">
-        <img :src="imgUrl" width="170" height="170" />
+        <img :src="imgUrl" width="170" height="170" :alt="name" />
       </div>
     </q-card-section>
 
