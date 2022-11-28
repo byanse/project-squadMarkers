@@ -3,10 +3,5 @@
   "appName": "PokeSquad",
   "bundledWebRuntime": false,
   "npmClient": "yarn",
-  "webDir": "www",
-  "plugins": {
-    "SplashScreen": {
-      "launchAutoHide": false
-    }
-  }
+  "webDir": "www"
 }
